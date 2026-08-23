@@ -15,10 +15,11 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 
 #           ---         ---         ---         #
-api_id = 000000000 # main api id from my.telegram.org/apps
-api_hash = 'XXXXXXXXXXXXXXXX' # main api hash from my.telegram.org/apps
-bot_token = 'XXXXXXXXXXXXXXXX' # main bot token from @botFather
-bot_admins = [000000000, 000000000] # admin userID
+api_id = int(os.getenv('API_ID'))
+api_hash = os.getenv('API_HASH')
+bot_token = os.getenv('BOT_TOKEN')
+bot_admins = [int(x) for x in os.getenv('BOT_ADMINS').split(',')]
+
 #           ---         ---         ---         #
 sleeping = 2 # main sleep time in sec ***[DO NOT EDIT]***
 step = None # current step ***[DO NOT EDIT]***
