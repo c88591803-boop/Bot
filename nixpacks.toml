@@ -1,6 +1,0 @@
-[phases.setup]
-nixPkgs = ['...', 'libntp', 'chrony']
-
-[phases.build]
-cmds = ['date']
-
