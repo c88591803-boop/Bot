@@ -1,25 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*- 
 
-# ┌──────────────────────────────────────┐
-# │                                   │
-# │   > installing guide :               │
-# │      $ pip install pyrogram==2.0.41  │
-# │      $ pip install asyncio           │
-# └──────────────────────────────────────┘
-
 import os, random, asyncio, time
 from pyrogram import Client, filters, errors
 from pyrogram.raw import functions, types
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-
-#           ---         ---         ---         #
-api_id = int(os.getenv('API_ID'))
-api_hash = os.getenv('API_HASH')
-bot_token = os.getenv('BOT_TOKEN')
-bot_admins = [int(x) for x in os.getenv('BOT_ADMINS').split(',')]
-
+#           ---  Environment Variables  ---         #
+api_id = int(os.getenv('API_ID', 0))
+api_hash = os.getenv('API_HASH', '')
+bot_token = os.getenv('BOT_TOKEN', '')
+bot_admins = [int(x) for x in os.getenv('BOT_ADMINS', '').split(',') if x.strip()]
 #           ---         ---         ---         #
 sleeping = 2 # main sleep time in sec ***[DO NOT EDIT]***
 step = None # current step ***[DO NOT EDIT]***
@@ -27,21 +18,17 @@ tempClient = dict() # temporary client holder ***[DO NOT EDIT]***
 isWorking = list() # Temporary Active Eval Names ***[DO NOT EDIT]***
 #           ---         ---         ---         #
 
-
 if not os.path.isdir('sessions') :
     os.mkdir('sessions')
-
 
 if not os.path.isfile('app.txt') :
     with open('app.txt', 'w', encoding='utf-8') as file:
         file.write(str(api_id) + ' ' + api_hash)
 
-
 async def randomString() -> str:
     '''Return a random string'''
     size = random.randint(4, 8)
     return ''.join(random.choice('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVLXYZ') for _ in range(size))
-
 
 async def randomAPP():
     with open('app.txt', 'r', encoding='utf-8') as file:
@@ -49,10 +36,8 @@ async def randomAPP():
         app_id, app_hash = random.choice(file).split()
     return app_id, app_hash
 
-
 async def accountList() :
     return [myFile.split('.')[0] for myFile in os.listdir('sessions') if os.path.isfile(os.path.join('sessions', myFile))]
-
 
 async def remainTime(TS):
     TS = time.time() - TS
@@ -63,21 +48,12 @@ async def remainTime(TS):
         sec = TS%60
         return str(int(min)) + ' دقیقه و ' + str(int(sec)) + ' ثانیه'
 
-
 bot = Client(
-    "LampStack_new",
+    "LampStack_Fix",
     bot_token = bot_token,
     api_id = api_id,
     api_hash = api_hash
 )
-
-
-try :
-    os.system("clear")
-except :
-    os.system("cls")
-print('Bot is Running ...')
-
 
 #           StartCommand            #
 @bot.on_message(filters.command(['start', 'cancel']) & filters.private & filters.user(bot_admins))
@@ -101,7 +77,7 @@ async def StartResponse(client, message):
     await message.reply('<b>> به منوی اصلی خوش آمدید :</b>', reply_markup=InlineKeyboardMarkup(my_keyboard), quote=True)
 
 #           StopEval            #
-@bot.on_message(filters.regex('^/stop_\w+') & filters.private & filters.user(bot_admins))
+@bot.on_message(filters.regex(r'^\/stop_\w+') & filters.private & filters.user(bot_admins))
 async def StopEval(client, message):
     global step, isWorking
     my_keyboard = [
@@ -113,8 +89,6 @@ async def StopEval(client, message):
         await message.reply(f'<b>عملیات با شناسه {evalID} با موفقیت خاتمه یافت ✅</b>', reply_markup=InlineKeyboardMarkup(my_keyboard), quote=True)
     else:
         await message.reply(f'<b>عملیات موردنظر یافت نشد !</b>', reply_markup=InlineKeyboardMarkup(my_keyboard), quote=True)
-
-
 
 #           callback query            #
 @bot.on_callback_query()
@@ -251,7 +225,6 @@ async def callbackQueries(client, query):
 • خطاهای ناشناخته : {error}
 • زمان سپری شده : {spendTime}''', reply_markup=InlineKeyboardMarkup(my_keyboard))
 
-
         elif data == 'setTime':
             step = 'setTime'
             my_keyboard = [
@@ -316,7 +289,6 @@ async def callbackQueries(client, query):
                     [InlineKeyboardButton('🔙', callback_data='backToMenu')],
                 ]
             await bot.edit_message_text(chat_id, message_id, '<b>یوزرنیم کاربر مورد نظرتان را با @ وارد کنید :</b>', reply_markup=InlineKeyboardMarkup(my_keyboard))
-
 
 #           Text Response            #
 @bot.on_message(filters.text & filters.private & filters.user(bot_admins))
@@ -460,7 +432,6 @@ async def TextResponse(client, message):
 • خطا : {error}
 • زمان سپری شده : {spendTime}</b>''', reply_markup=InlineKeyboardMarkup(my_keyboard), quote=True)
 
-
 #                       Leave Accounts                       #
     if step == 'leaveAccounts':
         step = None
@@ -574,7 +545,6 @@ async def TextResponse(client, message):
 • موفق : {done}
 • خطا : {error}
 • زمان سپری شده : {spendTime}''', reply_markup=InlineKeyboardMarkup(my_keyboard), quote=True)
-
 
 #                       send Public Post Roport                       #
     if step == 'reportPostPublic':
@@ -774,7 +744,6 @@ async def TextResponse(client, message):
 • خطا : {error}
 • زمان سپری شده : {spendTime}''', reply_markup=InlineKeyboardMarkup(my_keyboard), quote=True)
 
-
 #                       block users                       #
     if step == 'blockEval':
         step = None
@@ -834,14 +803,18 @@ async def TextResponse(client, message):
 • خطا : {error}
 • زمان سپری شده : {spendTime}''', reply_markup=InlineKeyboardMarkup(my_keyboard), quote=True)
 
+#           Runner with Sync fix            #
+async def main():
+    try:
+        os.system("clear")
+    except:
+        os.system("cls")
+    await bot.start()
+    bot.session.time_offset = 0
+    print('Bot is Running ...')
+    await asyncio.Event().wait()
 
+if __name__ == "__main__":
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())
 
-
-
-
-
-
-
-
-
-bot.run()
